@@ -2,13 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Night Exchange</title>
-  <style>
-    body { margin: 0; background: #0f0d0b; color: #f3ebdd; font-family: system-ui, sans-serif; min-height: 100vh; display: grid; place-items: center; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0d0b">
+  <title>The Night Exchange — Prototype 1</title>
+  <link rel="stylesheet" href="css/nx.css">
 </head>
 <body>
-  <p>The Night Exchange is coming soon</p>
+  <div class="nx-app" id="nx-app">
+    <header class="nx-hdr">
+      <div class="nx-brand">
+        <b>The Night Exchange</b>
+        <span>Prototype 1 · Cord into jack</span>
+      </div>
+      <button type="button" class="nx-sound" id="nx-sound" aria-pressed="false" title="Toggle sound (M)">
+        ♪ Off <kbd>M</kbd>
+      </button>
+    </header>
+
+    <div class="nx-window" aria-hidden="true">
+      <!-- Still placeholder window — living hill is Prototype 2 -->
+      <svg viewBox="0 0 800 160" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nx-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a1528"/>
+            <stop offset="1" stop-color="#0f0d0b"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="160" fill="url(#nx-sky)"/>
+        <circle cx="640" cy="36" r="3" fill="#f3ebdd" opacity=".55"/>
+        <circle cx="120" cy="28" r="1.5" fill="#f3ebdd" opacity=".4"/>
+        <circle cx="420" cy="22" r="1.2" fill="#f3ebdd" opacity=".35"/>
+        <path fill="#1a120e" d="M0 160 V98 L60 88 110 96 160 78 220 92 280 70 340 86 400 64 460 82 520 58 580 76 640 62 700 80 760 70 800 84 V160Z"/>
+        <path fill="#24180f" d="M0 160 V118 L80 108 140 120 200 104 270 118 330 100 400 114 470 98 540 116 610 102 680 118 740 108 800 120 V160Z"/>
+        <rect x="188" y="86" width="22" height="28" fill="#1c1410"/>
+        <rect x="194" y="92" width="6" height="6" fill="#3a2a18"/>
+        <rect x="372" y="78" width="28" height="36" fill="#1c1410"/>
+        <rect x="380" y="86" width="6" height="6" fill="#ee9a40" opacity=".55"/>
+        <rect x="552" y="72" width="24" height="30" fill="#1c1410"/>
+        <rect x="558" y="78" width="5" height="5" fill="#3a2a18"/>
+      </svg>
+      <span class="nx-window-caption">Window · still placeholder</span>
+    </div>
+
+    <main class="nx-stage" id="nx-stage">
+      <div class="nx-toprow">
+        <div class="nx-plate">
+          <h1>Exchange No. 1</h1>
+          <p>OPERATOR · SAMPLE<br>LINES OPEN · ALL HOURS</p>
+        </div>
+        <div class="nx-crt" id="nx-crt" aria-live="polite">
+          <div class="nx-crt-noise" aria-hidden="true"></div>
+          <div class="nx-crt-body">
+            <div class="sm" id="nx-crt-status">&gt; STANDBY · PICK UP THE RED CORD</div>
+            <div class="big" id="nx-crt-title">GOOD EVENING.</div>
+            <div class="sm" id="nx-crt-sub" style="margin-top:8px">PATCH A LINE TO BEGIN_</div>
+          </div>
+        </div>
+        <div class="nx-lamp-slot">
+          <span class="nx-lamp-host" id="nx-lamp" data-nx-mount="lamp"></span>
+        </div>
+      </div>
+
+      <!-- Desktop strip -->
+      <div class="nx-board-wrap nx-board-desktop" id="nx-board-desktop">
+        <div class="nx-board-host" data-nx-mount="board-strip" data-nx-board="strip"></div>
+        <div class="nx-jacks" id="nx-jacks-desktop" role="group" aria-label="Exchange lines"></div>
+      </div>
+      <div class="nx-labels nx-labels-desktop" id="nx-labels-desktop" aria-hidden="true"></div>
+
+      <!-- Phone grid -->
+      <div class="nx-board-wrap nx-board-phone" id="nx-board-phone">
+        <div class="nx-board-host" data-nx-mount="board-grid" data-nx-board="grid"></div>
+        <div class="nx-jacks" id="nx-jacks-phone" role="group" aria-label="Exchange lines"></div>
+      </div>
+      <div class="nx-labels nx-labels-phone" id="nx-labels-phone" aria-hidden="true"></div>
+
+      <div class="nx-shelf" id="nx-shelf">
+        <div class="nx-hook" id="nx-hook" aria-hidden="true"></div>
+        <div class="nx-props">
+          <span class="nx-coffee-host" data-nx-mount="label-coffee"></span>
+          <span class="nx-pencil-host" data-nx-mount="pencil"></span>
+        </div>
+        <button type="button" class="nx-plug-el" id="nx-plug" aria-label="Red cord plug. Drag to a jack, or press 1 through 6.">
+          <span class="nx-plug-host" data-nx-mount="plug"></span>
+        </button>
+      </div>
+
+      <canvas class="nx-cord-canvas" id="nx-cord" aria-hidden="true"></canvas>
+    </main>
+
+    <div class="nx-hints">
+      <span><kbd>Drag</kbd> plug into a jack</span>
+      <span><kbd>Tap</kbd> a jack on phone</span>
+      <span><kbd>1</kbd>–<kbd>6</kbd> dial</span>
+      <span><kbd>Esc</kbd> hang up</span>
+      <span><kbd>M</kbd> sound</span>
+    </div>
+  </div>
+
+  <div class="nx-ticket" id="nx-ticket" role="dialog" aria-modal="false" aria-labelledby="nx-ticket-title" hidden>
+    <div class="k" id="nx-ticket-k">LINE 01 · CALL TICKET · SAMPLE</div>
+    <h4 id="nx-ticket-title">Sample Title</h4>
+    <p id="nx-ticket-body">Placeholder description for this sample line. Connect feels expensive; content comes later.</p>
+    <div class="nx-ticket-actions">
+      <button type="button" class="nx-hangup" id="nx-hangup">Hang up</button>
+      <span class="meta">Esc also hangs up</span>
+    </div>
+  </div>
+
+  <div class="sr-only" id="nx-live" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="js/nx.js" defer></script>
 </body>
 </html>
