@@ -48,8 +48,13 @@ html, body {
   font-weight: 500;
   -webkit-tap-highlight-color: transparent;
 }
-body {
+/* Layout stability: the scrollbar gutter is always reserved, so the content width (and
+   therefore board scale and socket centres) never depends on whether the page overflows. */
+html {
+  scrollbar-gutter: stable;
   overflow-x: auto;
+}
+body {
   min-width: 360px;
 }
 button {
@@ -302,11 +307,8 @@ button {
   position: absolute;
   width: 64px;
   height: 64px;
-  transform: translate(-50%, -50%);
   pointer-events: auto;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
   touch-action: manipulation;
 }
 .nx-jack-btn:focus-visible {
@@ -314,14 +316,9 @@ button {
   outline-offset: 3px;
 }
 .nx-jack-host {
-  width: 72px;
-  height: 72px;
+  position: absolute;
   display: block;
   pointer-events: none;
-}
-.nx-board-phone .nx-jack-host {
-  width: 88px;
-  height: 88px;
 }
 .nx-jack-host svg { width: 100%; height: 100%; display: block; }
 
@@ -367,7 +364,8 @@ button {
   border-radius: 0 0 12px 12px;
   background: linear-gradient(180deg, #1a0f09, #2c1a10 30%, #3b2416);
   box-shadow: inset 0 10px 18px rgba(0,0,0,.55);
-  min-height: 140px;
+  /* Fits the J-scaled resting sprite (tip to hook <= 106 units at up to J≈118). */
+  min-height: 190px;
 }
 .nx-props {
   position: absolute;
@@ -396,16 +394,20 @@ button {
 
 .nx-plug-el {
   position: absolute;
-  width: 44px;
-  height: 78px;
-  transform: translate(-50%, -12%);
+  /* Plug in transit/upright/rotating sits on the top plug layer: above every jack (and the jacks' recesses), below the
+     spark (50) and the ticket (80). Once docked (f13) it drops below (30). */
+  z-index: 45;
   touch-action: none;
-  cursor: grab;
-  z-index: 30;
   user-select: none;
   -webkit-user-select: none;
+  /* The box is positioned/sized by JS; only the grip takes pointer input. */
+  pointer-events: none;
 }
-.nx-plug-el:active { cursor: grabbing; }
+.nx-plug-el.nx-plug-docked { z-index: 30; }
+/* Drop shadow while the plug is in transit, on the layer (not the pulsing svg); none once docked. */
+.nx-plug-el:not(.nx-plug-docked) .nx-plug-layer { filter: drop-shadow(0 6px 5px rgba(0, 0, 0, 0.5)); }
+/* Docked: only the f13 head (~37px) may draw, clipped to r19.5 about S so nothing can reach row 2. */
+.nx-plug-el.nx-plug-docked .nx-plug-sheet { clip-path: circle(19.5px at 60px 62px); }
 .nx-plug-el:focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
@@ -416,11 +418,35 @@ button {
   display: block;
   pointer-events: none;
 }
-.nx-plug-host svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+.nx-plug-host { position: relative; }
+.nx-plug-layer { position: absolute; inset: 0; display: block; }
+.nx-plug-layer svg { width: 100%; height: 100%; display: block; }
+/* production-B2 sprite sheet: 14 frames × 120×170 CSS (image is 2×), frame picked by JS via background-position.
+   Socket ref S = (60,62) is the transform origin. */
+.nx-plug-sheet {
+  background-repeat: no-repeat;
+  background-size: 1680px 170px;
+  transform-origin: 60px 62px;
 }
+/* Seat overshoot after f13 (CSS only, no translate): 3 frames at 60fps ≈ 50ms. Not used under reduced motion. */
+@keyframes nx-seat-bounce {
+  0%   { transform: scale(1); }
+  33%  { transform: scale(1.04); }
+  67%  { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+.nx-plug-sheet.is-seated { animation: nx-seat-bounce 50ms ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .nx-plug-sheet.is-seated { animation: none; } }
+/* Grab area: positioned by JS (NXGeo.display): the whole 44×78 original plug, or the seated head ellipse. */
+.nx-plug-grip {
+  position: absolute;
+  pointer-events: auto;
+  cursor: grab;
+  border-radius: 50%;
+}
+.nx-plug-el:active .nx-plug-grip { cursor: grabbing; }
+.nx-plug-el.nx-plug-inert .nx-plug-grip { pointer-events: none; }
+/* Pulse: the original plug.svg carries its own nx-is-pulse rules (2s, brightness only, off for reduced motion), as in P1. */
 
 /* ——— cord canvas ——— */
 .nx-cord-canvas {
@@ -432,9 +458,19 @@ button {
   z-index: 25;
 }
 
+.nx-spark-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50; /* z-order: board → jack → cord (25) → docked plug (30) → transit plug (45) → spark (50) */
+}
+
 /* ——— ticket / answered card ——— */
 .nx-ticket {
   position: fixed;
+  visibility: hidden;
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%) translateY(120%);
@@ -450,6 +486,7 @@ button {
   transition: transform 500ms ease-out, opacity 400ms ease-out;
 }
 .nx-ticket.is-open {
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
   opacity: 1;
   pointer-events: auto;
@@ -520,4 +557,10 @@ button {
   .nx-ticket { transition: opacity 200ms linear; }
   .nx-crt .big { transition: opacity 200ms linear; }
   .nx-crt-noise { transition: none; }
+}
+
+/* Phone: 12px side padding so a 390px viewport with a reserved classic gutter (<=17px)
+   still gives the grid >= 347px (bores >= 64px). */
+@media (max-width: 819px) {
+  .nx-app { padding-left: 12px; padding-right: 12px; }
 }

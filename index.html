@@ -89,6 +89,7 @@
       </div>
 
       <canvas class="nx-cord-canvas" id="nx-cord" aria-hidden="true"></canvas>
+      <canvas class="nx-spark-canvas" id="nx-spark" aria-hidden="true"></canvas>
     </main>
 
     <div class="nx-hints">
@@ -100,7 +101,7 @@
     </div>
   </div>
 
-  <div class="nx-ticket" id="nx-ticket" role="dialog" aria-modal="false" aria-labelledby="nx-ticket-title" hidden>
+  <div class="nx-ticket" id="nx-ticket" role="dialog" aria-modal="false" aria-labelledby="nx-ticket-title">
     <div class="k" id="nx-ticket-k">LINE 01 · CALL TICKET · SAMPLE</div>
     <h4 id="nx-ticket-title">Sample Title</h4>
     <p id="nx-ticket-body">Placeholder description for this sample line. Connect feels expensive; content comes later.</p>
@@ -112,6 +113,7 @@
 
   <div class="sr-only" id="nx-live" aria-live="assertive" aria-atomic="true"></div>
 
+  <script src="js/nx-geometry.js" defer></script>
   <script src="js/nx.js" defer></script>
 </body>
 </html>

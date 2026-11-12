@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" fill="none" class="nx-lightning nx-lightning-c" role="img" viewBox="0 0 64 48">
+  <title>Approach spark C — tip to socket (alt path)</title>
+  <defs>
+    <linearGradient id="nx-lz-c-edge" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#ee9a40" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#f7edd4" stop-opacity=".55"/>
+    </linearGradient>
+  </defs>
+  <path fill="none" stroke="url(#nx-lz-c-edge)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
+        d="M14 42 L20 30 L32 34 L36 18 L48 22 L50 12" opacity=".88"/>
+  <path fill="none" stroke="#fff6e4" stroke-linecap="round" stroke-linejoin="round" stroke-width=".9"
+        d="M14 42 L20 30 L32 34 L36 18 L48 22 L50 12" opacity=".95"/>
+  <circle cx="14" cy="42" r="1.25" fill="#fff6e4" opacity=".85"/>
+  <circle cx="50" cy="12" r="1.45" fill="#ee9a40" opacity=".7"/>
+</svg>
